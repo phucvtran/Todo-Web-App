@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Load Page title and style file -->
+    <title><%= pageTitle %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Add icon library -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <header>
+      <div class="jumbotron d-none d-sm-block"></div>
+      <!-- Load Navigation Bar -->
+      <%- include('./navigation')%>
+    </header>
+    <!-- Form For user input -->
+    <form method="POST">
+      <div id="myDIV" class="header">
+        <h2>My To Do List</h2>
+        <input
+          type="text"
+          name="newTask"
+          id="myInput"
+          placeholder="(Required) New Task..."
+        />
+
+        <!-- if the current path is not home page. the user input will be assigned to selected user and the textbox will be DISABLE -->
+        <input type="text" name="userInput" class="userInput" id="myUserInput"
+        <% if (selectedUser !== "") { %> placeholder = <%= selectedUser %>
+        disabled<% } else { %> placeholder="(Required) User..." <% } %>/>
+
+        <!-- <span onclick="newElement()" class="addBtn">Add</span> -->
+
+        <button class="addBtn">Add Task</button>
+      </div>
+
+      <ul id="myUL">
+        <!-- load the task list for ALL user on the home page and assigned task for selected user. -->
+        <!-- if task is Done, apply the style -->
+        <% data.reverse().forEach(task => { %> <% if (task.status === 'Done') {
+        %>
+        <li class="checked">
+          <%= task.date %> | <%= task.status %> | <%= task.task %> (Assigned to:
+          <%= task.user %>)
+          <div class="actionBtn">
+            <button
+              formaction="/updatetask"
+              name="updatebtn"
+              value="<%= task.task %>"
+            >
+              <i class="fa fa-undo"></i>
+            </button>
+
+            <button
+              formaction="/removetask"
+              name="removebtn"
+              value="<%= task.task %>"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </li>
+
+        <%} else { %>
+        <li>
+          <%= task.date %> | <%= task.status %> | <%= task.task %> (Assigned to:
+          <%= task.user %>)
+          <div class="actionBtn">
+            <button
+              formaction="/updatetask"
+              name="updatebtn"
+              value="<%= task.task %>"
+            >
+              <i class="fa fa-check"></i>
+            </button>
+
+            <button
+              formaction="/removetask"
+              name="removebtn"
+              value="<%= task.task %>"
+            >
+              <i class="fa fa-trash"></i>
+            </button>
+          </div>
+        </li>
+
+        <% } %> <% }) %>
+      </ul>
+    </form>
+  </body>
+</html>

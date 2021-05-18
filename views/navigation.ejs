@@ -1,0 +1,15 @@
+<!-- Navigation bar of the pages. -->
+<div class="navbar">
+  <a href="/">All User</a>
+  <div class="dropdown">
+    <button class="dropbtn">
+      Select User
+      <i class="fa fa-caret-down"></i>
+    </button>
+    <div class="dropdown-content">
+      <% allUser.forEach(item => { %>
+      <a href="/<%= item %> "><%= item %> </a>
+      <% }) %>
+    </div>
+  </div>
+</div>

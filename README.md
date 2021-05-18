@@ -30,4 +30,29 @@ localhost:3000
 ```
 * [Open Google Sheet](https://docs.google.com/spreadsheets/d/1A7zbj8_Fb7ew37jGnTTHCv9t3wW-GiPSq5B06gFxkJ0/edit?fbclid=IwAR28YU-Dp0Jw__tNqvxytJbSOcMRdnntzJMfIqYJTL1b0upjVERO7X6TK30#gid=0)
 
+## API Test with Postman
+
+* [Postman Download Link](https://www.postman.com/downloads/)
+* GET URL:
+```
+localhost:3000/api/all
+```
+* POST URL and body sample
+```
+localhost:3000/api/data
+
+Body: (status value can only be "New" or "Done")
+{
+    "task": "new task",
+    "status": "New",
+    "user": "user",
+    "date": "Mon - May 17 2021"
+ }
+```
+* Delete URL:
+```
+localhost:3000/api/data/:taskName
+
+replace <:taskName> with actual task name.
+```
 Happy Coding :)

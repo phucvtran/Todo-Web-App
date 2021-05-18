@@ -5,6 +5,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
+app.use(express.json());
 const bodyParser = require("body-parser");
 const SpreadsheetService = require("./services/SpreadsheetService");
 
@@ -31,6 +32,97 @@ function getUserList(list) {
   });
   return users.reverse();
 }
+/**
+ * Get all item from google sheet
+ *
+ * Method: GET
+ * URL: /api/all
+ *
+ * success code: 200
+ * failure code: 500
+ */
+app.get("/api/all", async (req, res) => {
+  try {
+    const data = [];
+    const allRows = await SpreadsheetService.getAllRows();
+    allRows.forEach((task) => {
+      data.push({
+        task: task.task,
+        status: task.status,
+        user: task.user,
+        date: task.date,
+      });
+    });
+
+    // pass in data as json
+    return res.send({ result: 200, data: data });
+  } catch (error) {
+    console.log(error);
+    return res.send({ result: 500, description: "something went wrong" });
+  }
+});
+
+/**
+ * Add new task or update status of the task
+ *
+ * Method: POST
+ * URL: /api/data
+ *
+ * success code: 200
+ * failure code: 500
+ */
+app.post("/api/data", async (req, res) => {
+  try {
+    const allRows = await SpreadsheetService.getAllRows();
+    const row = allRows.filter(
+      (param) =>
+        param.task === req.body.task.trim() &&
+        param.user === req.body.user.trim()
+    );
+    // if there is a matched task
+    if (row.length > 0) {
+      await SpreadsheetService.updateRow(row[0], req.body.status);
+      return res.send({
+        result: 200,
+        description: "Key already exists, Update Task Status",
+      });
+    } else {
+      await SpreadsheetService.addRow(req.body);
+      return res.send({ result: 200, description: "New task Add" });
+    }
+  } catch (error) {
+    return res.send({ result: 500, description: "something went wrong" });
+  }
+});
+
+/**
+ * Delete a task using task name
+ *
+ * Method: DELETE
+ * URL: /api/data/:task
+ *
+ * success code: 200
+ * failure code: 500
+ */
+app.delete("/api/data/:task", async (req, res) => {
+  try {
+    const allRows = await SpreadsheetService.getAllRows();
+    const row = allRows.filter(
+      (param) => param.task === req.params.task.trim()
+    );
+    // delete if condition is met
+    await row[0].delete();
+    return res.send({
+      status: 200,
+      description: "task: " + req.params.task + " is deleted",
+    });
+  } catch (error) {
+    return res.send({
+      result: 404,
+      description: "key not found",
+    });
+  }
+});
 
 /**
  * Load data from google sheet to home page.
@@ -102,8 +194,11 @@ app.post("/updatetask", async (req, res, next) => {
     );
 
     // Update status based on current status.
-    updateRow[0].status = updateRow[0].status === "New" ? "Done" : "New";
-    await updateRow[0].save();
+    await SpreadsheetService.updateRow(
+      updateRow[0],
+      updateRow[0].status === "New" ? "Done" : "New"
+    );
+
     return res.redirect("back");
   } catch (error) {
     return next(error);
